@@ -1,0 +1,11 @@
+# https://devcenter.heroku.com/articles/build-docker-images-heroku-yml
+# to configure a specific runner version change the RUNNER_VERSION (e.g. RUNNER_VERSION: 2.320.1), otherwise the latest version available is used by default
+build:
+  config:
+    RUNNER_VERSION: latest
+  docker:
+    runner: Dockerfile
+
+# Note, in private spaces the 'run:' setting is ignored in heroku.yml.
+# Instead, Heroku uses the 'CMD' or `ENTRYPOINT` setting in your Dockerfile.
+# https://help.heroku.com/RNIC7H18

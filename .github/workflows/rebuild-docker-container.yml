@@ -1,0 +1,21 @@
+name: Rebuild Docker Container
+
+on:
+  workflow_dispatch:
+    # Enables running the workflow manually
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+  schedule:
+    # Run at 1:00 AM UTC on Sundays (may be delayed depending on resource availability)
+    # https://crontab.guru/#0_1_*_*_0
+    # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+    - cron: '0 1 * * 0'
+
+jobs:
+  rebuild-docker:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: heroku-reference-apps/github-heroku-flow-action@main
+        with:
+          heroku-api-key: ${{secrets.HEROKU_API_KEY}} # set it on GitHub as secret
+          heroku-app-name: ${{vars.HEROKU_SELFHOSTED_RUNNER_APPNAME}} # set it on GitHub as variable
