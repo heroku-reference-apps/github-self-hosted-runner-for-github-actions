@@ -3,6 +3,7 @@
 build:
   config:
     RUNNER_VERSION: latest
+    RUNNER_ARCH: x64
   docker:
     runner: Dockerfile
 

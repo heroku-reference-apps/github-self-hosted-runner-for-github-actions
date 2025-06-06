@@ -2,6 +2,7 @@
 
 # This file inspired by tutorial at
 # https://testdriven.io/blog/github-actions-docker/
+# It selects the runner directory based on the packaging method (Dockerfile or CNB buildpack)
 
 # Requests a temporary token to register a GitHub runner.
 # https://docs.github.com/en/rest/reference/actions#create-a-registration-token-for-an-organization
@@ -15,7 +16,7 @@
 # GitHub access tokens can contain alphanumeric characters (a-z, A-Z, 0-9), underscores (_)
 [[ "${GITHUB_ACCESS_TOKEN}" ]] || { echo "GITHUB_ACCESS_TOKEN is required"; exit 1; }
 [[ "${GITHUB_ACCESS_TOKEN}" =~ ^[a-zA-Z0-9_]+$ ]] || { echo "GITHUB_ACCESS_TOKEN contains invalid characters"; exit 1; }
-# saving it localli before removing the env var (see unset_vars)
+# saving it locally before removing the env var (see unset_vars)
 LOCAL_GITHUB_ACCESS_TOKEN="${GITHUB_ACCESS_TOKEN}"
 
 # HIDDEN_ENV_VARS must only contain a list of space separated Heroku env vars. Those can contain uppercase letters (A-Z), numbers (0-9), underscores (_)
@@ -80,11 +81,19 @@ detachRunner() {
     --token "${GITHUB_REG_TOKEN}"
 }
 
-# Recall that this script is running in our dockerized image on Heroku.
-# Our Dockerfile created a user named 'docker' and the following directory is
-# where it installed the GitHub Actions self-hosting runner package.
-# We now navigate to that directory to start the runner.
-cd "${HOME}"/actions-runner || { echo "error while changing directory to ${HOME}/actions-runner"; exit 1; }
+# Directory selection logic
+# If the installation was done in the Dockerfile, use the Dockerfile path
+# Otherwise, default to CNB path that is in the current working directory
+if [[ -d "${HOME}/actions-runner" ]]; then
+  RUNNER_DIR="${HOME}/actions-runner"
+elif [[ -d "${PWD}/actions-runner" ]]; then
+  RUNNER_DIR="${PWD}/actions-runner"
+else
+  echo "Could not determine runner directory. Neither CNB nor Dockerfile path exists." >&2
+  exit 1
+fi
+
+cd "$RUNNER_DIR" || { echo "error while changing directory to $RUNNER_DIR"; exit 1; }
 
 attachRunner
 
@@ -132,4 +141,4 @@ unset_vars
 PID=$!
 wait $PID
 
-echo "[self-hosted runner] Exiting ..."
+echo "[self-hosted runner] Exiting ..." 

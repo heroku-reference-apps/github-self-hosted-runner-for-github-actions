@@ -12,15 +12,34 @@ validate_version() {
     fi
 }
 
+# Function to validate architecture input
+validate_arch() {
+    local arch="$1"
+    if [[ "$arch" == "x64" || "$arch" == "arm64" ]]; then
+        echo "$arch"
+    else
+        echo "Error: Architecture must be 'x64' or 'arm64'"
+        exit 1
+    fi
+}
+
 # Check if version parameter is provided
 if [ -z "$1" ]; then
     echo "Error: Please provide a version (e.g. 'latest' or '2.320.1')."
-    echo "Usage: $0 <version>"
+    echo "Usage: $0 <version> <arch>"
     exit 1
 fi
 
-# Validate the version input
+# Check if architecture parameter is provided
+if [ -z "$2" ]; then
+    echo "Error: Please provide the runner architecture ('x64' or 'arm64')."
+    echo "Usage: $0 <version> <arch>"
+    exit 1
+fi
+
+# Validate the version and architecture input
 VERSION_INPUT=$(validate_version "$1")
+ARCH_INPUT=$(validate_arch "$2")
 
 # Define the GitHub repository and API endpoint
 if [ "$VERSION_INPUT" == "latest" ]; then
@@ -42,9 +61,9 @@ if [ -z "$RUNNER_VERSION" ]; then
 fi
 echo "Latest version: ${RUNNER_VERSION}"
 
-# Define the asset name (e.g., for Linux x64; adjust as needed)
+# Define the asset name (e.g., for Linux x64 / arm64)
 RUNNER_OS="linux"
-RUNNER_ARCH="x64"
+RUNNER_ARCH="$ARCH_INPUT"
 
 ASSET_NAME="actions-runner-${RUNNER_OS}-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz"
 # printf is used to parse RELEASE_JSON as it might contain unescaped control characters (like newlines, tabs, ...)
@@ -88,10 +107,10 @@ else
     fi
 fi
 
-# Extract the runner and install some additional dependencies
+# Extract the runner. The additional dependencies usually required are already included using Heroku stack.
 # https://github.com/actions/runner/blob/main/docs/start/envlinux.md#install-net-core-3x-linux-dependencies
-tar xvfz "${ASSET_NAME}" && ./bin/installdependencies.sh
+tar xvfz "${ASSET_NAME}"
 
 # Clean up
 rm -f "${ASSET_NAME}"
-echo "Cleaned up downloaded file."
+echo "Cleaned up downloaded file." 

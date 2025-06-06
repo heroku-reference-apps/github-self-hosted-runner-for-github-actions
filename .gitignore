@@ -39,3 +39,4 @@ $RECYCLE.BIN/
 *.env
 *.dev
 .act
+.cursor/

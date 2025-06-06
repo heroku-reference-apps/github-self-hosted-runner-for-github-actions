@@ -10,6 +10,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 # https://devcenter.heroku.com/articles/build-docker-images-heroku-yml#set-build-time-environment-variables
 ARG RUNNER_VERSION=latest
 
+# this ARG can be overridden changing the heroku.yml, it must be 'x64' (or 'arm64' when supported along with Dockerfile)
+# https://devcenter.heroku.com/articles/build-docker-images-heroku-yml#set-build-time-environment-variables
+ARG RUNNER_ARCH=x64
+
 USER root
 
 # Switch to bash shell.
@@ -66,7 +70,7 @@ WORKDIR ${ACTIONS_DIR}
 
 # Download the latest GitHub Actions runner package.
 COPY install-actions-runner.sh /tmp/install-actions-runner.sh
-RUN sh /tmp/install-actions-runner.sh "$RUNNER_VERSION" && rm -f /tmp/install-actions-runner.sh
+RUN sh /tmp/install-actions-runner.sh "$RUNNER_VERSION" "$RUNNER_ARCH" && rm -f /tmp/install-actions-runner.sh
 
 # ------------------------------------------------------------------------------
 # Copy files and set permissions

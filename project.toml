@@ -1,0 +1,21 @@
+[_]
+schema-version = "0.2"
+
+[[io.buildpacks.group]]
+id = "heroku/github-actions-runner"
+version = "1.0.0"
+
+  [io.buildpacks.group.script]
+  api = "0.11"
+  inline = "./inline-cnb-build.sh"
+
+[build]
+builder = "heroku/builder:24"
+
+[[io.buildpacks.build.env]]
+name='RUNNER_VERSION'
+value='latest'
+
+# to build it locally with pack for arm64/amd64:
+# pack build my-runner-app --builder heroku/builder:24 --platform linux/arm64
+# pack build my-runner-app --builder heroku/builder:24 --platform linux/amd64

@@ -1,8 +1,8 @@
 ## Heroku-hosted runner for GitHub Actions
 
-This project defines a `Dockerfile` to run a custom Heroku-hosted runner for Github Actions (see also [self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners)).
+This project defines a `Dockerfile`/`CNB` to build and run a custom Heroku-hosted runner for Github Actions (see also [self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners)).
 
-The runner is hosted on [Heroku as a docker image](https://devcenter.heroku.com/articles/build-docker-images-heroku-yml) via `heroku.yml`.
+The runner is hosted on Heroku as a [docker image](https://devcenter.heroku.com/articles/build-docker-images-heroku-yml) via `heroku.yml` or [OCI image](https://devcenter.heroku.com/articles/buildpacks#cloud-native-buildpacks) via `project.toml`.
 
 ## How it works
 
@@ -102,7 +102,7 @@ This project includes a workflow that can be run manually or automatically sched
 
 To take advantage of the above automation you need to [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) or [mirror](https://docs.github.com/en/repositories/creating-and-managing-repositories/duplicating-a-repository#mirroring-a-repository-in-another-location) this repository to your private organisation's repository and enable workflows run.
 
-If you need to implement version pinning to avoid potential supply chain vulnerabilities, it's possible to configure a specific runner version (see `RUNNER_VERSION` in heroku.yml). In this case you'll have to modify manually the version and run the above mentioned workflow manually and the scheduled workflow execution can be disabled.
+If you need to implement version pinning to avoid potential supply chain vulnerabilities, it's possible to configure a specific runner version (see `RUNNER_VERSION` in heroku.yml/project.toml). In this case you'll have to modify manually the version and run the above mentioned workflow manually and the scheduled workflow execution can be disabled.
 
 Whenever the runner package is downloaded (either the latest or a specific version) the SHA256 checksum is verified, if the computed checksum does not match with the expected one the build fails.
 
@@ -112,10 +112,11 @@ This new release:
 - Uses ephemeral compute to allow [autoscaling](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/autoscaling-with-self-hosted-runners#using-ephemeral-runners-for-autoscaling) and [hardening](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#hardening-for-self-hosted-runners) of self-hosted runners. Ephemeral runners are short-lived containers that are executed only once for a single job, providing isolated environments to reduce the risk of data leakage
 - Uses a [base image](https://devcenter.heroku.com/articles/stack) that is curated and maintained by Heroku
 - Logs the self-runner name to manage it from the GitHub dashboard
-- Reduces the Docker image footprint and it's possible to run it as one-off dyn
+- Reduces the Docker/OCI image footprint and it's possible to run it as one-off dyno (Cedar only)
 - Includes all the recent GitHub self-hosted runners features (e.g. labels, groups, ...) and streamlines the configuration and setup
-- Integrates the [Heroku Button](https://www.heroku.com/elements/buttons) to install the runner in one-click
+- Integrates the [Heroku Button](https://www.heroku.com/elements/buttons) to install the runner in one-click (Cedar only)
 - Supports fine-grained GitHub tokens for granular permission control
+- Can be executed on both Heroku Cedar and Heroku Next Generation Platform Fir
 
 ## Security Notes and Recommendations
 Below are summarised some general recommendations to improve security for using GitHub Actions and self-hosted runners, for a complete guide and further details please refer to [Security hardening for GitHub Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions):
@@ -155,7 +156,6 @@ Below are summarised some general recommendations to improve security for using 
 ## Limits and Considerations
 - As the runner image is not based on the [standard GitHub dockerfile](https://github.com/actions/runner/blob/main/images/Dockerfile) then some Actions might not work as expected
 - Currently, it's not possible to run GitHub Actions requiring docker/rootless-docker as they need higher privileges that are not allowed on Heroku dynos for security reasons
-- The runner cannot be executed on [Fir](https://devcenter.heroku.com/changelog-items/3071) yet, requiring an ARM based image
 
 
 ## Credits

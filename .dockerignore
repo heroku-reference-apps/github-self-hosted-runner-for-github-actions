@@ -1,0 +1,43 @@
+# Version control
+.git
+.gitignore
+
+# Editor/project files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Local/dev tools and caches
+.sfdx/
+.eslintcache
+.act/
+.cursor/
+
+# Logs and debug files
+logs
+*.log
+
+# Environment and secret files
+*.env
+*.dev
+.act
+
+# Documentation and non-runtime files
+app.json
+heroku.yml
+project.toml
+inline-cnb-build.sh
+README.md
+CONTRIBUTING.md
+SECURITY.md
+LICENSE.txt
+CODEOWNERS
+CODE_OF_CONDUCT.md
+
+# Build/test artifacts and images
+images/
+
+# GitHub workflows and configs
+.github/
